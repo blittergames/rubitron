@@ -1,18 +1,18 @@
-==
-Rubitron is a simple game defending a stash.  It is made with Rubygame.
-==
-Installation credit (Kiba):
+== rubitron
 
-To install Ruby and rubygems (if you don't already have them):
+ http://github.com/blittergames/rubitron/tree/master
 
-sudo apt-get install ruby irb ri rubygems ruby-dev
+== SYNOPSIS:
 
-To install rubygame and its SDL dependencies:
+  A game where you defend your stash by blasting enemies.
 
-sudo apt-get install libsdl1.2-all libsdl1.2-dev libsdl-gfx1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev 
-libsdl-ttf2.0-dev
+== REQUIREMENTS:
 
-You may also need to install libsdl1.2debian-pulseaudio
+* Rubygame (its dependancies, SDL)
+* Gamebox
 
-sudo gem install rubygame --platform=ruby
+== LICENSE:
 
+(GPL)
+
+Copyright (c) 2009 Haroon Khalid
