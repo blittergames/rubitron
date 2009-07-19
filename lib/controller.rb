@@ -57,12 +57,14 @@ class Player
 	end
 	
 	def shoot
-		@p_bullets.create_bullet(@screen, @x, @y)
+		bullet_x = @x + 8
+		bullet_y = @y + 25
+		@p_bullets.create_bullet(@screen, bullet_x, bullet_y)
 	end
 	
 	def movement_hook
 		movement_hooks = {
-		:up => :shoot,
+		:space => :shoot,
 		:left => :left,
 		:right => :right,
 		}
