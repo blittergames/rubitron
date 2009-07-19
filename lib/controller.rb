@@ -1,10 +1,10 @@
 class Bullet
 	attr_accessor :bullet_img, :x, :y
-	def initialize screen_name
+	def initialize screen_name, x, y
 		@screen_name = screen_name
 		@bullet_img = Surface.load("graphics/bullet.png")
-		@x = 150
-		@y = 400
+		@x = x
+		@y = y
 	end
 	
 	def update
@@ -19,8 +19,8 @@ class Bullets
 	@bullet_shots = []
 	end
 	
-	def create_bullet(screen_name)
-		b = Bullet.new(screen_name)
+	def create_bullet(screen_name, x, y)
+		b = Bullet.new(screen_name, x, y)
 		@bullet_shots << b
 	end
 
@@ -57,7 +57,7 @@ class Player
 	end
 	
 	def shoot
-		@p_bullets.create_bullet(@screen)
+		@p_bullets.create_bullet(@screen, @x, @y)
 	end
 	
 	def movement_hook
