@@ -1,76 +1,80 @@
-class Animation
- 
-  attr_reader :data, :cur_frame, :ticks, :ticks_remaining, :pos
-  def initialize data
-    @my_clock = Rubygame::Clock.new()
-    @my_clock.enable_tick_events()
-    @data = data # data = [ [time, image], [time, image], ...]
-    @cur_frame = 0
-    @ticks = @my_clock.tick()
-    @ticks_remaining = data[0][0]
-    @pos = [0, 0]
-  end
-  
-  def draw dest
-    @old_ticks = @ticks
-    @ticks = @my_clock.tick()
-    @tick_difference = (@ticks - @old_ticks)
-    @ticks_remaining += tick_difference
-    @dest = dest
-  
-    while @ticks_remaining <= 0
-      @cur_frame += 1
-      @cur_frame %= @data.length
-      @ticks_remaining += @data[@cur_frame][0]
-    end
-      
-    @data[@cur_frame][1].blit(dest, @pos)
-  
-  end
+class Bullet
+	attr_accessor :bullet_img, :x, :y
+	def initialize screen_name
+		@screen_name = screen_name
+		@bullet_img = Surface.load("graphics/bullet.png")
+		@x = 150
+		@y = 400
+	end
+	
+	def update
+		@y -= 50
+		@bullet_img.blit(@screen_name,[@x,@y])
+	end
+end
+
+class Bullets
+	attr_accessor :bullet_shots
+	def initialize screen_name
+	@bullet_shots = []
+	end
+	
+	def create_bullet(screen_name)
+		b = Bullet.new(screen_name)
+		@bullet_shots << b
+	end
+
+	def update_bullets()
+		@bullet_shots.each do |b|
+			b.update()
+		end
+	end
 end
 
 class Player
 	include Rubygame::EventHandler::HasEventHandler
-	attr_accessor :queue, :screen, :x, :y, :hurt
+	attr_accessor :queue, :screen, :x, :y, :p_bullets
 	def initialize screen
 		@screen = screen
 		@queue = Rubygame::EventQueue.new()
 		@queue.enable_new_style_events()
 		@player_1_img = Surface.load("graphics/player_ship.png")
-		@player_2_img = Surface.load("graphics/player_ship_2.png")
 	    @x = 150
 		@y = 400
-		@font = TTF.new("data/Welbut__.ttf",18)
+		@font = TTF.new("data/Welbut__.ttf",12)
 		@text_str = "Player: " + "#{@x}" + ", " + "#{@y}"
-		@text = @font.render(@text_str,false,[214,214,214])
-		@hurt = Animation.new([[1000, @player_1_img],[1000, @player_2_img]])	
+		@text = @font.render(@text_str,false,[242,0,255])
+		@p_bullets = Bullets.new(@screen)
 	end
 	
 	def right
-	    @x += 5
+	    @x += 10
 	end
 	
 	def left
 		puts 'left key hit!'
-		@x -= 5
+		@x -= 10
 	end
 	
-	def move		
-		@queue.each do |event|
-		    handle(event)
-		end
+	def shoot
+		@p_bullets.create_bullet(@screen)
 	end
-		
+	
 	def movement_hook
 		movement_hooks = {
+		:up => :shoot,
 		:left => :left,
 		:right => :right,
 		}
 		make_magic_hooks(movement_hooks)
 	end	
-		
-
-
+	
+	def move    
+		@queue.each do |event|
+		handle(event)
+		end
+	end
+			
 	def draw
 		@player_1_img.blit(@screen,[@x,@y])
 		@text.blit(@screen, [10,10])
@@ -96,6 +100,13 @@ class Controller
 		Rubygame::Events::QuitRequested => :quit
 		}
 		make_magic_hooks(quit_hooks)
+		
+		hook = {
+			:owner => @p1,
+			:trigger => Rubygame::EventTriggers::YesTrigger.new(),
+			:action => Rubygame::EventActions::MethodAction.new(:handle)
+			}
+		append_hook(hook)
 	end
   
     def fps_update()
@@ -112,9 +123,10 @@ class Controller
 			end
 			@p1.move()
 			fps_update()
+			@screen.fill([0,0,0])
 			@background.blit(@screen,[0,0])
-			@p1.hurt.draw(@screen)
 			@p1.draw()
+			@p1.p_bullets.update_bullets()
 			@screen.flip()
 			@clock.tick()
 		end
